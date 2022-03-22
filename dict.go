@@ -24,6 +24,10 @@ type Dict struct {
 	avDict *C.struct_AVDictionary
 }
 
+type DictEntry struct {
+	avDictEntry *C.struct_AVDictionaryEntry
+}
+
 func NewDict(pairs []Pair) *Dict {
 	this := &Dict{avDict: nil}
 

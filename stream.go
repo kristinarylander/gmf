@@ -12,6 +12,7 @@ import "C"
 
 import (
 	"fmt"
+	"unsafe"
 )
 
 type Stream struct {
@@ -126,6 +127,34 @@ func (s *Stream) NbFrames() int {
 	return int(s.avStream.nb_frames)
 }
 
+func (s *Stream) DictCount() int {
+	return int(C.av_dict_count((*C.struct_AVDictionary)(s.avStream.metadata)))
+}
+
+func (s *Stream) DictSet(pair *Pair) int {
+
+	ckey := C.CString(pair.Key)
+	defer C.free(unsafe.Pointer(ckey))
+	cval := C.CString(pair.Val)
+	defer C.free(unsafe.Pointer(cval))
+
+	return int(C.av_dict_set((**C.struct_AVDictionary)(unsafe.Pointer(&s.avStream.metadata)), ckey, cval, 0))
+}
+
+func (s *Stream) DictGet(key string, prev *DictEntry, flags int) *Pair {
+	dictentry := &DictEntry{avDictEntry: nil}
+	pair := &Pair{}
+	Ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(Ckey))
+
+	dictentry.avDictEntry = C.av_dict_get((*C.struct_AVDictionary)(s.avStream.metadata), Ckey, (*C.struct_AVDictionaryEntry)(prev.avDictEntry), C.int(flags))
+
+	pair.Key = C.GoString(dictentry.avDictEntry.key)
+	pair.Val = C.GoString(dictentry.avDictEntry.value)
+
+	return pair
+}
+
 func (s *Stream) TimeBase() AVRational {
 	return AVRational(s.avStream.time_base)
 }
@@ -140,6 +169,10 @@ func (s *Stream) IsAudio() bool {
 
 func (s *Stream) IsVideo() bool {
 	return s.Type() == AVMEDIA_TYPE_VIDEO
+}
+
+func (s *Stream) CurDts() int64 {
+	return int64(s.avStream.cur_dts)
 }
 
 func (s *Stream) Duration() int64 {

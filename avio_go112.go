@@ -1,3 +1,4 @@
+//go:build go1.12
 // +build go1.12
 
 package gmf
@@ -48,9 +49,10 @@ var (
 //
 //	avoictx := NewAVIOContext(ctx, &AVIOHandlers{ReadPacket: gridFsReader})
 type AVIOHandlers struct {
-	ReadPacket  func() ([]byte, int)
-	WritePacket func([]byte) int
-	Seek        func(int64, int) int64
+	ReadPacket  func(interface{}, int) ([]byte, int)
+	WritePacket func(interface{}, []byte) int
+	Seek        func(interface{}, int64, int) int64
+	UserData    interface{}
 }
 
 // Global map of AVIOHandlers
@@ -151,7 +153,7 @@ func readCallBack(opaque unsafe.Pointer, buf *C.uint8_t, buf_size C.int) C.int {
 		panic("No reader handler initialized")
 	}
 
-	b, n := handlers.ReadPacket()
+	b, n := handlers.ReadPacket(handlers.UserData, int(buf_size))
 	if n > 0 {
 		C.memcpy(unsafe.Pointer(buf), unsafe.Pointer(&b[0]), C.size_t(n))
 	}
@@ -172,7 +174,7 @@ func writeCallBack(opaque unsafe.Pointer, buf *C.uint8_t, buf_size C.int) C.int 
 		panic("No writer handler initialized.")
 	}
 
-	return C.int(handlers.WritePacket(C.GoBytes(unsafe.Pointer(buf), buf_size)))
+	return C.int(handlers.WritePacket(handlers.UserData, C.GoBytes(unsafe.Pointer(buf), buf_size)))
 }
 
 //export seekCallBack
@@ -188,5 +190,5 @@ func seekCallBack(opaque unsafe.Pointer, offset C.int64_t, whence C.int) C.int64
 		panic("No seek handler initialized.")
 	}
 
-	return C.int64_t(handlers.Seek(int64(offset), int(whence)))
+	return C.int64_t(handlers.Seek(handlers.UserData, int64(offset), int(whence)))
 }

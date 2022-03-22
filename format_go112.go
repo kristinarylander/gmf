@@ -1,3 +1,4 @@
+//go:build go1.12
 // +build go1.12
 
 // Format.
@@ -198,6 +199,20 @@ func NewInputCtx(filename string) (*FmtCtx, error) {
 	return ctx, nil
 }
 
+func NewInputCtxWithNoOption(filename string) (*FmtCtx, error) {
+	ctx := NewCtx()
+
+	if ctx.avCtx == nil {
+		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
+	}
+
+	if err := ctx.OpenInputWithNoOption(filename); err != nil {
+		return nil, err
+	}
+
+	return ctx, nil
+}
+
 func NewInputCtxWithFormatName(filename, format string) (*FmtCtx, error) {
 	ctx := NewCtx()
 
@@ -254,6 +269,25 @@ func (ctx *FmtCtx) OpenInput(filename string) error {
 	return nil
 }
 
+func (ctx *FmtCtx) OpenInputWithNoOption(filename string) error {
+	var (
+		cfilename *C.char
+	)
+
+	if filename == "" {
+		cfilename = nil
+	} else {
+		cfilename = C.CString(filename)
+		defer C.free(unsafe.Pointer(cfilename))
+	}
+
+	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, nil); averr < 0 {
+		return errors.New(fmt.Sprintf("Error opening input '%s': %s", filename, AvError(int(averr))))
+	}
+
+	return nil
+}
+
 func (ctx *FmtCtx) AddStreamWithCodeCtx(codeCtx *CodecCtx) (*Stream, error) {
 	var ost *Stream
 
@@ -283,7 +317,7 @@ func (ctx *FmtCtx) IsGlobalHeader() bool {
 	return ctx.avCtx != nil && ctx.avCtx.oformat != nil && (ctx.avCtx.oformat.flags&C.AVFMT_GLOBALHEADER) != 0
 }
 
-func (ctx *FmtCtx) WriteHeader() error {
+func (ctx *FmtCtx) WriteHeader(d *Dict) error {
 	cfilename := &(ctx.avCtx.filename[0])
 
 	// If NOFILE flag isn't set and we don't use custom IO, open it
@@ -293,7 +327,7 @@ func (ctx *FmtCtx) WriteHeader() error {
 		}
 	}
 
-	if averr := C.avformat_write_header(ctx.avCtx, nil); averr < 0 {
+	if averr := C.avformat_write_header(ctx.avCtx, (**C.struct_AVDictionary)(unsafe.Pointer(&d.avDict))); averr < 0 {
 		return errors.New(fmt.Sprintf("Unable to write header to '%s': %s", ctx.Filename, AvError(int(averr))))
 	}
 
@@ -520,6 +554,19 @@ func (ctx *FmtCtx) SetDebug(val int) *FmtCtx {
 func (ctx *FmtCtx) SetFlag(flag int) *FmtCtx {
 	ctx.avCtx.flags |= C.int(flag)
 	return ctx
+}
+
+func (ctx *FmtCtx) SeekFrame(ist *Stream, ts int64, flag int) int {
+	return int(C.av_seek_frame(ctx.avCtx, C.int(ist.Index()), C.int64_t(ts), C.int(flag)))
+}
+
+func (ctx *FmtCtx) DictSet(key, val string, flags int) int {
+	ckey := C.CString(key)
+	defer C.free(unsafe.Pointer(ckey))
+	cval := C.CString(val)
+	defer C.free(unsafe.Pointer(cval))
+
+	return int(C.av_dict_set((**C.struct_AVDictionary)(unsafe.Pointer(&ctx.avCtx.metadata)), ckey, cval, C.int(flags)))
 }
 
 func (ctx *FmtCtx) SeekFile(ist *Stream, minTs, maxTs int64, flag int) error {

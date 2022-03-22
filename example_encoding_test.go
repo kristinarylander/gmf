@@ -55,8 +55,8 @@ func Example() {
 	// videoStream.SetCodecCtx(videoEncCtx)
 
 	outputCtx.SetStartTime(0)
-
-	if err = outputCtx.WriteHeader(); err != nil {
+	opts := gmf.Dict{}
+	if err = outputCtx.WriteHeader(&opts); err != nil {
 		log.Fatal(err)
 	}
 	outputCtx.Dump()

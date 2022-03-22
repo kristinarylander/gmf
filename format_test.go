@@ -3,11 +3,12 @@ package gmf_test
 import (
 	"errors"
 	"fmt"
-	"github.com/3d0c/gmf"
 	"io"
 	"log"
 	"os"
 	"testing"
+
+	"github.com/3d0c/gmf"
 )
 
 var (
@@ -110,7 +111,8 @@ func TestWriteHeader(t *testing.T) {
 	stream.DumpContexCodec(cc)
 	// stream.SetCodecCtx(cc)
 
-	if err := outputCtx.WriteHeader(); err != nil {
+	opts := gmf.Dict{}
+	if err := outputCtx.WriteHeader(&opts); err != nil {
 		t.Fatal(err)
 	}
 
@@ -160,7 +162,7 @@ func TestGetNextPacket(t *testing.T) {
 
 var section *io.SectionReader
 
-func customReader() ([]byte, int) {
+func customReader(userdata interface{}, size int) ([]byte, int) {
 	var file *os.File
 	var err error
 
