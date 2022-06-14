@@ -171,10 +171,6 @@ func (s *Stream) IsVideo() bool {
 	return s.Type() == AVMEDIA_TYPE_VIDEO
 }
 
-func (s *Stream) CurDts() int64 {
-	return int64(s.avStream.cur_dts)
-}
-
 func (s *Stream) Duration() int64 {
 	return int64(s.avStream.duration)
 }
