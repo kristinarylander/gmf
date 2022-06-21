@@ -32,6 +32,7 @@ type Filter struct {
 	filterGraph *C.AVFilterGraph
 }
 
+/*
 func NewFilter(desc string, srcStreams []*Stream, ost *Stream, options []*Option) (*Filter, error) {
 	f := &Filter{
 		filterGraph: C.avfilter_graph_alloc(),
@@ -105,7 +106,7 @@ func NewFilter(desc string, srcStreams []*Stream, ost *Stream, options []*Option
 	}
 
 	return f, nil
-}
+}*/
 
 func (f *Filter) create(filter, name, args string) (*C.AVFilterContext, int) {
 	var (

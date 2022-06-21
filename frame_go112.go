@@ -110,6 +110,7 @@ func (f *Frame) Height() int {
 	return int(f.avFrame.height)
 }
 
+/*
 func (f *Frame) PktPts() int64 {
 	return int64(f.avFrame.pkt_pts)
 }
@@ -120,7 +121,7 @@ func (f *Frame) PktPos() int64 {
 
 func (f *Frame) SetPktPts(val int64) {
 	f.avFrame.pkt_pts = (C.int64_t)(val)
-}
+}*/
 
 func (f *Frame) PktDts() int {
 	return int(f.avFrame.pkt_dts)

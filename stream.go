@@ -45,13 +45,14 @@ func (s *Stream) DumpContexCodec(codec *CodecCtx) {
 	}
 }
 
+/*
 func (s *Stream) SetCodecFlags() {
 	s.avStream.codec.flags |= C.AV_CODEC_FLAG_GLOBAL_HEADER
-}
+}*/
 
 // CodecCtx
 // Deprecated: Using AVStream.codec to pass codec parameters to muxers is deprecated, use AVStream.codecpar instead.
-func (s *Stream) CodecCtx() *CodecCtx {
+/*func (s *Stream) CodecCtx() *CodecCtx {
 	// Supposed that output context is set and opened by user
 	if s.IsCodecCtxSet() {
 		return s.cc
@@ -79,7 +80,7 @@ func (s *Stream) CodecCtx() *CodecCtx {
 	s.cc.avCodecCtx.time_base = s.avStream.codec.time_base
 
 	return s.cc
-}
+}*/
 
 // SetCodecCtx
 // Deprecated: Using AVStream.codec to pass codec parameters to muxers is deprecated, use AVStream.codecpar instead.

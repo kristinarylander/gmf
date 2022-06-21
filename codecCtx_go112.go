@@ -212,6 +212,7 @@ func (cc *CodecCtx) SetOptions(options []Option) {
 	}
 }
 
+/*
 func (cc *CodecCtx) CopyExtra(ist *Stream) *CodecCtx {
 	codec := cc.avCodecCtx
 	icodec := ist.CodecCtx().avCodecCtx
@@ -238,7 +239,7 @@ func (cc *CodecCtx) CopyExtra(ist *Stream) *CodecCtx {
 	codec.has_b_frames = icodec.has_b_frames
 
 	return cc
-}
+}*/
 
 // SetExtradata TODO: Improving performance
 //   Free or avcodec_free_context can free extradata

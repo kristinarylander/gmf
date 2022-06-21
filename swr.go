@@ -83,6 +83,7 @@ func (ctx *SwrCtx) Flush(nbSamples int) (*Frame, error) {
 	return dst, nil
 }
 
+/*
 func DefaultResampler(ost *Stream, frames []*Frame, flush bool) []*Frame {
 	var (
 		result             []*Frame = make([]*Frame, 0)
@@ -134,4 +135,4 @@ func DefaultResampler(ost *Stream, frames []*Frame, flush bool) []*Frame {
 	}
 
 	return result
-}
+}*/

@@ -288,6 +288,7 @@ func (ctx *FmtCtx) OpenInputWithNoOption(filename string) error {
 	return nil
 }
 
+/*
 func (ctx *FmtCtx) AddStreamWithCodeCtx(codeCtx *CodecCtx) (*Stream, error) {
 	var ost *Stream
 
@@ -303,7 +304,7 @@ func (ctx *FmtCtx) AddStreamWithCodeCtx(codeCtx *CodecCtx) (*Stream, error) {
 	}
 
 	return ost, nil
-}
+}*/
 
 func (ctx *FmtCtx) WriteTrailer() {
 	C.av_write_trailer(ctx.avCtx)
@@ -318,14 +319,14 @@ func (ctx *FmtCtx) IsGlobalHeader() bool {
 }
 
 func (ctx *FmtCtx) WriteHeader(d *Dict) error {
-	cfilename := &(ctx.avCtx.filename[0])
+	/*cfilename := &(ctx.avCtx.filename[0])
 
 	// If NOFILE flag isn't set and we don't use custom IO, open it
 	if !ctx.IsNoFile() && !ctx.customPb {
 		if averr := C.avio_open(&ctx.avCtx.pb, cfilename, C.AVIO_FLAG_WRITE); averr < 0 {
 			return errors.New(fmt.Sprintf("Unable to open '%s': %s", ctx.Filename, AvError(int(averr))))
 		}
-	}
+	}*/
 
 	if averr := C.avformat_write_header(ctx.avCtx, (**C.struct_AVDictionary)(unsafe.Pointer(&d.avDict))); averr < 0 {
 		return errors.New(fmt.Sprintf("Unable to write header to '%s': %s", ctx.Filename, AvError(int(averr))))
@@ -362,13 +363,14 @@ func (ctx *FmtCtx) SetOformat(ofmt *OutputFmt) error {
 	return nil
 }
 
+/*
 func (ctx *FmtCtx) Dump() {
 	if ctx.ofmt == nil {
 		C.av_dump_format(ctx.avCtx, 0, &(ctx.avCtx.filename[0]), 0)
 	} else {
 		C.av_dump_format(ctx.avCtx, 0, &(ctx.avCtx.filename[0]), 1)
 	}
-}
+}*/
 
 func (ctx *FmtCtx) DumpAv() {
 	fmt.Println("AVCTX:\n", ctx.avCtx, "\niformat:\n", ctx.avCtx.iformat)
@@ -577,6 +579,7 @@ func (ctx *FmtCtx) SeekFile(ist *Stream, minTs, maxTs int64, flag int) error {
 	return nil
 }
 
+/*
 func (ctx *FmtCtx) SeekFrameAt(sec int64, streamIndex int) error {
 	ist, err := ctx.GetStream(streamIndex)
 	if err != nil {
@@ -592,7 +595,7 @@ func (ctx *FmtCtx) SeekFrameAt(sec int64, streamIndex int) error {
 	ist.CodecCtx().FlushBuffers()
 
 	return nil
-}
+}*/
 
 func (ctx *FmtCtx) SetPb(val *AVIOContext) *FmtCtx {
 	ctx.avCtx.pb = val.avAVIOContext
