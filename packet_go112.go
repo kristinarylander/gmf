@@ -1,3 +1,4 @@
+//go:build go1.12
 // +build go1.12
 
 package gmf
@@ -34,6 +35,14 @@ func NewPacket() *Packet {
 	p := &Packet{}
 
 	C.av_new_packet(&p.avPacket, 0)
+
+	return p
+}
+
+func AllocPacket() *Packet {
+	p := &Packet{}
+
+	p.avPacket = *C.av_packet_alloc()
 
 	return p
 }
@@ -148,6 +157,10 @@ func (p *Packet) SetStreamIndex(val int) *Packet {
 
 func (p *Packet) Free() {
 	C.av_packet_unref(&p.avPacket)
+}
+
+func (p *Packet) Free2() {
+	C.av_packet_free((**C.struct_AVPacket)(unsafe.Pointer(&p.avPacket)))
 }
 
 func (p *Packet) Time(timebase AVRational) int {
