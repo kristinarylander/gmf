@@ -420,6 +420,27 @@ func (ctx *FmtCtx) GetNewPackets() chan *Packet {
 	return yield
 }
 
+func (ctx *FmtCtx) AVReadFrame(pkt *Packet) error {
+	for {
+		ret := int(C.av_read_frame(ctx.avCtx, &pkt.avPacket))
+
+		if AvErrno(ret) == syscall.EAGAIN {
+			time.Sleep(10000 * time.Microsecond)
+			continue
+		}
+		if ret == AVERROR_EOF {
+			return io.EOF
+		}
+		if ret < 0 {
+			return AvError(ret)
+		}
+
+		break
+	}
+
+	return nil
+}
+
 func (ctx *FmtCtx) NewStream(c *Codec) *Stream {
 	var avCodec *C.struct_AVCodec = nil
 
