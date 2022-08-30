@@ -39,14 +39,6 @@ func NewPacket() *Packet {
 	return p
 }
 
-func AllocPacket() *Packet {
-	p := &Packet{}
-
-	p.avPacket = *C.av_packet_alloc()
-
-	return p
-}
-
 // Init same to NewPacket and av_new_packet
 //   Initialize optional fields of a packet with default values.
 //   Note, this does not touch the data and size members, which have to be
@@ -157,10 +149,6 @@ func (p *Packet) SetStreamIndex(val int) *Packet {
 
 func (p *Packet) Free() {
 	C.av_packet_unref(&p.avPacket)
-}
-
-func (p *Packet) Free2() {
-	C.av_packet_free((**C.struct_AVPacket)(unsafe.Pointer(&p.avPacket)))
 }
 
 func (p *Packet) Time(timebase AVRational) int {

@@ -205,7 +205,7 @@ func (s *Stream) GetStartTime() int64 {
 }
 
 func (s *Stream) GetCodecPar() *CodecParameters {
-	cp := NewCodecParameters()
+	cp := &CodecParameters{}
 	cp.avCodecParameters = s.avStream.codecpar
 
 	return cp
