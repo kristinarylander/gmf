@@ -335,6 +335,23 @@ func (ctx *FmtCtx) WriteHeader(d *Dict) error {
 	return nil
 }
 
+func (ctx *FmtCtx) OpenAVIO(filename string) error {
+	cfilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cfilename))
+
+	if averr := C.avio_open(&ctx.avCtx.pb, cfilename, C.AVIO_FLAG_READ_WRITE); averr < 0 {
+		return errors.New(fmt.Sprintf("Unable to open '%s': %s", ctx.Filename, AvError(int(averr))))
+	}
+	return nil
+}
+
+func (ctx *FmtCtx) CloseAVIO() error {
+	if averr := C.avio_close(ctx.avCtx.pb); averr < 0 {
+		return errors.New(fmt.Sprintf("Unable to close: %s", AvError(int(averr))))
+	}
+	return nil
+}
+
 func (ctx *FmtCtx) WritePacket(p *Packet) error {
 	if averr := C.av_interleaved_write_frame(ctx.avCtx, &p.avPacket); averr < 0 {
 		return errors.New(fmt.Sprintf("Unable to write packet to '%s': %s", ctx.Filename, AvError(int(averr))))
