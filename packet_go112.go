@@ -151,6 +151,10 @@ func (p *Packet) Free() {
 	C.av_packet_unref(&p.avPacket)
 }
 
+func (p *Packet) PacketFree() {
+	C.av_packet_free((**C.struct_AVPacket)(unsafe.Pointer(&p.avPacket)))
+}
+
 func (p *Packet) Time(timebase AVRational) int {
 	return int(float64(timebase.AVR().Num) / float64(timebase.AVR().Den) * float64(p.Pts()))
 }
