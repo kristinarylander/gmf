@@ -152,6 +152,9 @@ func (p *Packet) Free() {
 }
 
 func (p *Packet) PacketFree() {
+	p2 := &p.avPacket
+	p3 := unsafe.Pointer(p2)
+	fmt.Println(p3)
 	C.av_packet_free((**C.struct_AVPacket)(unsafe.Pointer(&p.avPacket)))
 }
 
