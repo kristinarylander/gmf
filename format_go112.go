@@ -213,20 +213,6 @@ func NewInputCtxWithNoOption(filename string) (*FmtCtx, error) {
 	return ctx, nil
 }
 
-func NewInputCtxWithSkipOption(filename string, skipInitialBytes string) (*FmtCtx, error) {
-	ctx := NewCtx()
-
-	if ctx.avCtx == nil {
-		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
-	}
-
-	if err := ctx.OpenInputWithSkipOption(filename, skipInitialBytes); err != nil {
-		return nil, err
-	}
-
-	return ctx, nil
-}
-
 func NewInputCtxWithFormatName(filename, format string) (*FmtCtx, error) {
 	ctx := NewCtx()
 
@@ -283,7 +269,7 @@ func (ctx *FmtCtx) OpenInput(filename string) error {
 	return nil
 }
 
-func (ctx *FmtCtx) OpenInputWithNoOption(filename string) error {
+func (ctx *FmtCtx) OpenInputWithNoOption(filename string, offset int64) error {
 	var (
 		cfilename *C.char
 	)
@@ -295,28 +281,7 @@ func (ctx *FmtCtx) OpenInputWithNoOption(filename string) error {
 		defer C.free(unsafe.Pointer(cfilename))
 	}
 
-	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, nil); averr < 0 {
-		return errors.New(fmt.Sprintf("Error opening input '%s': %s", filename, AvError(int(averr))))
-	}
-
-	return nil
-}
-
-func (ctx *FmtCtx) OpenInputWithSkipOption(filename string, skipInitialBytes string) error {
-	var (
-		cfilename *C.char
-	)
-
-	if filename == "" {
-		cfilename = nil
-	} else {
-		cfilename = C.CString(filename)
-		defer C.free(unsafe.Pointer(cfilename))
-	}
-
-	inputOptionsDict := NewDict([]Pair{{Key: "skip_initial_bytes", Val: skipInitialBytes}})
-	inputOption := &Option{Key: "input_options", Val: inputOptionsDict}
-	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, &(inputOption.Val.(*Dict).avDict)); averr < 0 {
+	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, nil, C.int64_t(offset)); averr < 0 {
 		return errors.New(fmt.Sprintf("Error opening input '%s': %s", filename, AvError(int(averr))))
 	}
 
