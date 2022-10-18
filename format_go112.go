@@ -199,14 +199,14 @@ func NewInputCtx(filename string) (*FmtCtx, error) {
 	return ctx, nil
 }
 
-func NewInputCtxWithNoOption(filename string, offset int64) (*FmtCtx, error) {
+func NewInputCtxWithNoOption(filename string) (*FmtCtx, error) {
 	ctx := NewCtx()
 
 	if ctx.avCtx == nil {
 		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
 	}
 
-	if err := ctx.OpenInputWithNoOption(filename, offset); err != nil {
+	if err := ctx.OpenInputWithNoOption(filename); err != nil {
 		return nil, err
 	}
 
@@ -269,7 +269,7 @@ func (ctx *FmtCtx) OpenInput(filename string) error {
 	return nil
 }
 
-func (ctx *FmtCtx) OpenInputWithNoOption(filename string, offset int64) error {
+func (ctx *FmtCtx) OpenInputWithNoOption(filename string) error {
 	var (
 		cfilename *C.char
 	)
@@ -281,7 +281,7 @@ func (ctx *FmtCtx) OpenInputWithNoOption(filename string, offset int64) error {
 		defer C.free(unsafe.Pointer(cfilename))
 	}
 
-	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, nil, C.int64_t(offset)); averr < 0 {
+	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, nil); averr < 0 {
 		return errors.New(fmt.Sprintf("Error opening input '%s': %s", filename, AvError(int(averr))))
 	}
 
