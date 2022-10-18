@@ -199,14 +199,14 @@ func NewInputCtx(filename string) (*FmtCtx, error) {
 	return ctx, nil
 }
 
-func NewInputCtxWithNoOption(filename string) (*FmtCtx, error) {
+func NewInputCtxWithNoOption(filename string, offset int64) (*FmtCtx, error) {
 	ctx := NewCtx()
 
 	if ctx.avCtx == nil {
 		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
 	}
 
-	if err := ctx.OpenInputWithNoOption(filename); err != nil {
+	if err := ctx.OpenInputWithNoOption(filename, offset); err != nil {
 		return nil, err
 	}
 
