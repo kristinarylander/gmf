@@ -199,14 +199,16 @@ func NewInputCtx(filename string) (*FmtCtx, error) {
 	return ctx, nil
 }
 
-func NewInputCtxWithNoOption(filename string, offset int) (*FmtCtx, error) {
+func NewInputCtxWithSkipOption(filename string, offset int) (*FmtCtx, error) {
 	ctx := NewCtx()
 
 	if ctx.avCtx == nil {
 		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
 	}
 
-	if err := ctx.OpenInputWithSkipOption(filename, offset); err != nil {
+	ctx.OpenAVIOWithSkip(filename, offset)
+
+	if err := ctx.OpenInputWithSkipOption(filename); err != nil {
 		return nil, err
 	}
 
@@ -269,7 +271,7 @@ func (ctx *FmtCtx) OpenInput(filename string) error {
 	return nil
 }
 
-func (ctx *FmtCtx) OpenInputWithSkipOption(filename string, offset int) error {
+func (ctx *FmtCtx) OpenInputWithSkipOption(filename string) error {
 	var (
 		cfilename *C.char
 	)
@@ -280,8 +282,6 @@ func (ctx *FmtCtx) OpenInputWithSkipOption(filename string, offset int) error {
 		cfilename = C.CString(filename)
 		defer C.free(unsafe.Pointer(cfilename))
 	}
-
-	ctx.SetOptions([]*Option{{"skip_initial_bytes", offset}})
 
 	if averr := C.avformat_open_input(&ctx.avCtx, cfilename, nil, nil); averr < 0 {
 		return errors.New(fmt.Sprintf("Error opening input '%s': %s", filename, AvError(int(averr))))
@@ -343,6 +343,20 @@ func (ctx *FmtCtx) OpenAVIO(filename string) error {
 
 	if averr := C.avio_open(&ctx.avCtx.pb, cfilename, C.AVIO_FLAG_READ_WRITE); averr < 0 {
 		return errors.New(fmt.Sprintf("Unable to open '%s': %s", ctx.Filename, AvError(int(averr))))
+	}
+	return nil
+}
+
+func (ctx *FmtCtx) OpenAVIOWithSkip(filename string, skipBytes int) error {
+	cfilename := C.CString(filename)
+	defer C.free(unsafe.Pointer(cfilename))
+
+	if averr := C.avio_open(&ctx.avCtx.pb, cfilename, C.AVIO_FLAG_READ_WRITE); averr < 0 {
+		return errors.New(fmt.Sprintf("Unable to open '%s': %s", ctx.Filename, AvError(int(averr))))
+	}
+
+	if averr := C.avio_skip(ctx.avCtx.pb, C.int64_t(skipBytes)); averr < 0 {
+		return errors.New(fmt.Sprintf("Unable to skip %v bytes '%s': %s", skipBytes, ctx.Filename, AvError(int(averr))))
 	}
 	return nil
 }
