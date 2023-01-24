@@ -206,7 +206,9 @@ func NewInputCtxWithSkipOption(filename string, offset int) (*FmtCtx, error) {
 		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
 	}
 
-	ctx.OpenAVIOWithSkip(filename, offset)
+	if err := ctx.OpenAVIOWithSkip(filename, offset); err != nil {
+		return ctx, err
+	}
 
 	if err := ctx.OpenInputWithSkipOption(filename); err != nil {
 		return nil, err
@@ -351,7 +353,7 @@ func (ctx *FmtCtx) OpenAVIOWithSkip(filename string, skipBytes int) error {
 	cfilename := C.CString(filename)
 	defer C.free(unsafe.Pointer(cfilename))
 
-	if averr := C.avio_open(&ctx.avCtx.pb, cfilename, C.AVIO_FLAG_READ_WRITE); averr < 0 {
+	if averr := C.avio_open(&ctx.avCtx.pb, cfilename, AVIO_FLAG_READ); averr < 0 {
 		return errors.New(fmt.Sprintf("Unable to open '%s': %s", ctx.Filename, AvError(int(averr))))
 	}
 
