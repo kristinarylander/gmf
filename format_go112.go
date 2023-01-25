@@ -210,7 +210,21 @@ func NewInputCtxWithSkipOption(filename string, offset int) (*FmtCtx, error) {
 		return ctx, err
 	}
 
-	if err := ctx.OpenInputWithSkipOption(filename); err != nil {
+	if err := ctx.OpenInputWithNoOption(filename); err != nil {
+		return nil, err
+	}
+
+	return ctx, nil
+}
+
+func NewInputCtxWithNoOption(filename string) (*FmtCtx, error) {
+	ctx := NewCtx()
+
+	if ctx.avCtx == nil {
+		return nil, errors.New(fmt.Sprintf("unable to allocate context"))
+	}
+
+	if err := ctx.OpenInputWithNoOption(filename); err != nil {
 		return nil, err
 	}
 
@@ -273,7 +287,7 @@ func (ctx *FmtCtx) OpenInput(filename string) error {
 	return nil
 }
 
-func (ctx *FmtCtx) OpenInputWithSkipOption(filename string) error {
+func (ctx *FmtCtx) OpenInputWithNoOption(filename string) error {
 	var (
 		cfilename *C.char
 	)
