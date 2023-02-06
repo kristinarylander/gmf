@@ -1,3 +1,4 @@
+//go:build go1.12
 // +build go1.12
 
 package gmf
@@ -70,16 +71,16 @@ static int gmf_check_sample_rate(AVCodec *codec, int input_sample_rate) {
 }
 
 static int select_channel_layout(AVCodec *codec) {
-    const uint64_t *p;
+    const AVChannelLayout *p;
     uint64_t best_ch_layout = 0;
     int best_nb_channels    = 0;
 
-    if (!codec->channel_layouts)
+    if (!codec->ch_layouts)
         return AV_CH_LAYOUT_STEREO;
 
-    p = codec->channel_layouts;
+    p = codec->ch_layouts;
     while (*p) {
-        int nb_channels = av_get_channel_layout_nb_channels(*p);
+        int nb_channels = *p->nb_channels;
 
         if (nb_channels > best_nb_channels) {
             best_ch_layout   = *p;
@@ -92,21 +93,6 @@ static int select_channel_layout(AVCodec *codec) {
 
 static void call_av_freep(AVCodecContext *out){
     return av_freep(&out);
-}
-
-static char * gmf_get_channel_layout_name(int channels, int layout) {
-    AVBPrint pbuf;
-
-    av_bprint_init(&pbuf, 0, 1);
-    av_bprint_channel_layout(&pbuf, channels, layout);
-
-    char *result = av_mallocz(pbuf.len);
-
-    memcpy(result, pbuf.str, pbuf.len);
-
-    av_bprint_clear(&pbuf);
-
-    return result;
 }
 
 */
@@ -546,12 +532,6 @@ func (cc *CodecCtx) GetRefs() int {
 
 func (cc *CodecCtx) GetSampleFmtName() string {
 	return C.GoString(C.av_get_sample_fmt_name(cc.avCodecCtx.sample_fmt))
-}
-
-func (cc *CodecCtx) GetChannelLayoutName() string {
-	str := C.GoString(C.gmf_get_channel_layout_name(C.int(cc.Channels()), C.int(cc.ChannelLayout())))
-
-	return str
 }
 
 func (cc *CodecCtx) GetDefaultChannelLayout(ac int) int {
