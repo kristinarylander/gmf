@@ -509,9 +509,10 @@ func (cc *CodecCtx) GetSampleFmtName() string {
 	return C.GoString(C.av_get_sample_fmt_name(cc.avCodecCtx.sample_fmt))
 }
 
+/*
 func (cc *CodecCtx) GetDefaultChannelLayout(ac int) int {
 	return int(C.av_get_default_channel_layout(C.int(ac)))
-}
+}*/
 
 func (cc *CodecCtx) GetBitsPerSample() int {
 	return int(C.av_get_bits_per_sample(cc.codec.avCodec.id))
