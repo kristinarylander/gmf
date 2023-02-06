@@ -70,27 +70,6 @@ static int gmf_check_sample_rate(AVCodec *codec, int input_sample_rate) {
     return 0;
 }
 
-static int select_channel_layout(AVCodec *codec) {
-    const AVChannelLayout *p;
-    uint64_t best_ch_layout = 0;
-    int best_nb_channels    = 0;
-
-    if (!codec->ch_layouts)
-        return AV_CH_LAYOUT_STEREO;
-
-    p = codec->ch_layouts;
-    while (*p) {
-        int nb_channels = *p->nb_channels;
-
-        if (nb_channels > best_nb_channels) {
-            best_ch_layout   = *p;
-            best_nb_channels = nb_channels;
-        }
-        p++;
-    }
-    return best_ch_layout;
-}
-
 static void call_av_freep(AVCodecContext *out){
     return av_freep(&out);
 }
@@ -456,10 +435,6 @@ func (cc *CodecCtx) SetBitsPerRawSample(val int) *CodecCtx {
 
 func (cc *CodecCtx) SelectSampleRate() int {
 	return int(C.select_sample_rate(cc.codec.avCodec))
-}
-
-func (cc *CodecCtx) SelectChannelLayout() int {
-	return int(C.select_channel_layout(cc.codec.avCodec))
 }
 
 func (cc *CodecCtx) FlushBuffers() {

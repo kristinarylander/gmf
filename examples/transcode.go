@@ -52,7 +52,7 @@ func addStream(codecName string, oc *FmtCtx, ist *Stream) (int, int) {
 		cc.SetSampleFmt(ist.CodecCtx().SampleFmt())
 		cc.SetSampleRate(ist.CodecCtx().SampleRate())
 		cc.SetChannels(ist.CodecCtx().Channels())
-		cc.SelectChannelLayout()
+		//cc.SelectChannelLayout()
 		cc.SelectSampleRate()
 
 	}

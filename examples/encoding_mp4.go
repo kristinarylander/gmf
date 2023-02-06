@@ -72,8 +72,8 @@ func audio(outputCtx *FmtCtx, output chan *Packet) *Stream {
 	occ.SetSampleFmt(AV_SAMPLE_FMT_S16P).
 		SetSampleRate(cc.SampleRate()).
 		SetBitRate(128e3)
-	channelLayout := occ.SelectChannelLayout()
-	occ.SetChannelLayout(channelLayout)
+	//channelLayout := occ.SelectChannelLayout()
+	//occ.SetChannelLayout(channelLayout)
 
 	if err := occ.Open(nil); err != nil {
 		log.Fatal("can't open output codec context", err.Error())

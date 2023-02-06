@@ -51,7 +51,7 @@ func addStream(name string, oc *gmf.FmtCtx, ist *gmf.Stream) (int, int, error) {
 				{Key: "time_base", Val: ist.CodecCtx().TimeBase().AVR()},
 				{Key: "ar", Val: ist.CodecCtx().SampleRate()},
 				{Key: "ac", Val: ist.CodecCtx().Channels()},
-				{Key: "channel_layout", Val: cc.SelectChannelLayout()},
+				//{Key: "channel_layout", Val: cc.SelectChannelLayout()},
 			},
 		)
 

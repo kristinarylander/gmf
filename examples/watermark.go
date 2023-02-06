@@ -74,7 +74,7 @@ func addStream(codecName string, oc *gmf.FmtCtx, ist *gmf.Stream) (int, int) {
 		cc.SetSampleFmt(ist.CodecCtx().SampleFmt())
 		cc.SetSampleRate(ist.CodecCtx().SampleRate())
 		cc.SetChannels(ist.CodecCtx().Channels())
-		cc.SelectChannelLayout()
+		//cc.SelectChannelLayout()
 		cc.SelectSampleRate()
 
 	}
